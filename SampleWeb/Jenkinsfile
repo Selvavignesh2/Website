@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Clone the code from the Git repository
+                git 'https://github.com/Selvavignesh2/Website.git'
+
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Build the Docker image
+                script {
+                    sh 'docker build -t e-commerce-website .'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Run the Docker container and expose it on port 90
+                script {
+                    // Stop any running container with the same name
+                    sh 'docker stop e-commerce-container || true && docker rm e-commerce-container || true'
+                    // Run the new container
+                    sh 'docker run -d -p 90:90 --name e-commerce-container e-commerce-website'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment successful! The e-commerce website is running on port 90.'
+        }
+        failure {
+            echo 'Deployment failed! Please check the build logs.'
+        }
+    }
+}
+
