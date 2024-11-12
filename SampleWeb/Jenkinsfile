@@ -2,42 +2,44 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                // Clone the code from the Git repository
+                // Clone the Git repository containing the website project
                 git 'https://github.com/Selvavignesh2/Website.git'
-
             }
         }
 
-        stage('Build') {
+        stage('Build Docker Image') {
             steps {
-                // Build the Docker image
                 script {
-                    sh 'docker build -t e-commerce-website .'
+                    // Build the Docker image
+                    sh 'docker build -t my-website:latest .'
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Run Docker Container') {
             steps {
-                // Run the Docker container and expose it on port 90
                 script {
-                    // Stop any running container with the same name
-                    sh 'docker stop e-commerce-container || true && docker rm e-commerce-container || true'
-                    // Run the new container
-                    sh 'docker run -d -p 90:90 --name e-commerce-container e-commerce-website'
+                    // Run the Docker container and expose it on port 90
+                    sh 'docker run -d -p 90:80 --name my-website-container my-website:latest'
                 }
             }
         }
     }
 
     post {
+        always {
+            echo 'Cleaning up...'
+            // Stop and remove the container if it exists
+            sh 'docker stop my-website-container || true'
+            sh 'docker rm my-website-container || true'
+        }
         success {
-            echo 'Deployment successful! The e-commerce website is running on port 90.'
+            echo 'Website deployed successfully on port 90!'
         }
         failure {
-            echo 'Deployment failed! Please check the build logs.'
+            echo 'Deployment failed!'
         }
     }
 }

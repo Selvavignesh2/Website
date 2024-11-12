@@ -1,19 +1,12 @@
-# Use the official Node.js image from Docker Hub
-FROM node:16-alpine
+# Use a lightweight web server image
+FROM nginx:alpine
 
-# Set the working directory inside the container
-WORKDIR /app
+# Copy the website files to the default Nginx directory
+COPY index.html /usr/share/nginx/html/
 
-# Copy package.json and install dependencies
-COPY package.json ./
-RUN npm install
-
-# Copy the rest of the application code
-COPY . .
-
-# Expose the application on port 90
+# Expose port 90
 EXPOSE 90
 
-# Start the application
-CMD ["npm", "start"]
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
 
