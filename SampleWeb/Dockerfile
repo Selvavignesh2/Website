@@ -3,7 +3,7 @@ FROM nginx:alpine
 
 WORKDIR /root
 # Copy the website files to the default Nginx directory
-COPY index.html /root
+COPY . .
 
 # Expose port 90
 EXPOSE 90
