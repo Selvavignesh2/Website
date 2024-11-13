@@ -11,7 +11,7 @@ pipeline {
             steps {
                 script {
                     // Navigate to the sampleweb folder
-                    dir('sampleweb') {
+                    dir('SampleWeb') {
                         // Build the Docker image
                         sh 'docker build -t sampleweb-app .'
                     }
