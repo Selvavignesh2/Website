@@ -1,45 +1,39 @@
 pipeline {
     agent any
-
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                // Clone the Git repository containing the website project
+                // Clone the repository
                 git 'https://github.com/Selvavignesh2/Website.git'
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build the Docker image
-                    sh 'docker build -t my-website:latest -f Dockerfile .'
+                    // Navigate to the sampleweb folder
+                    dir('sampleweb') {
+                        // Build the Docker image
+                        sh 'docker build -t sampleweb-app .'
+                    }
                 }
             }
         }
-
         stage('Run Docker Container') {
             steps {
                 script {
-                    // Run the Docker container and expose it on port 90
-                    sh 'docker run -d -p 90:80 --name my-website-container my-website:latest'
+                    // Run the Docker container, mapping port 90
+                    sh 'docker run -d -p 90:80 --name sampleweb-container sampleweb-app'
                 }
             }
         }
     }
-
     post {
         always {
-            echo 'Cleaning up...'
-            // Stop and remove the container if it exists
-            sh 'docker stop my-website-container || true'
-            sh 'docker rm my-website-container || true'
-        }
-        success {
-            echo 'Website deployed successfully on port 90!'
-        }
-        failure {
-            echo 'Deployment failed!'
+            script {
+                // Cleanup: Stop and remove the container
+                sh 'docker stop sampleweb-container || true'
+                sh 'docker rm sampleweb-container || true'
+            }
         }
     }
 }
